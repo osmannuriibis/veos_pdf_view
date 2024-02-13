@@ -174,6 +174,8 @@ class AlhPdfView extends StatefulWidget {
   /// This works only for iOS.
   final LinkHandleCallback? onLinkHandle;
 
+  final TextDirection layoutDirection;
+
   const AlhPdfView({
     this.filePath,
     this.bytes,
@@ -204,6 +206,7 @@ class AlhPdfView extends StatefulWidget {
     this.enableDefaultScrollHandle = false,
     this.spacing = 0,
     super.key,
+    this.layoutDirection = TextDirection.ltr,
   })  : assert(filePath != null || bytes != null),
         assert(defaultZoomFactor > 0.0),
         assert(minZoom > 0),
@@ -274,9 +277,7 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
             final onZoomChanged = widget.onZoomChanged;
             final alhPdfViewController = this._alhPdfViewController;
 
-            if (this.mounted &&
-                onZoomChanged != null &&
-                alhPdfViewController != null) {
+            if (this.mounted && onZoomChanged != null && alhPdfViewController != null) {
               final newZoom = await alhPdfViewController.getZoom();
 
               if (newZoom != this._zoom) {
@@ -293,17 +294,16 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
             ) {
               return AndroidViewSurface(
                 controller: controller as AndroidViewController,
-                gestureRecognizers: widget.gestureRecognizers ??
-                    const <Factory<OneSequenceGestureRecognizer>>{},
+                gestureRecognizers:
+                    widget.gestureRecognizers ?? const <Factory<OneSequenceGestureRecognizer>>{},
                 hitTestBehavior: PlatformViewHitTestBehavior.opaque,
               );
             },
             onCreatePlatformView: (PlatformViewCreationParams params) {
-              final surfaceController = PlatformViewsService
-                  .initSurfaceAndroidView(
+              final surfaceController = PlatformViewsService.initSurfaceAndroidView(
                 id: params.id,
                 viewType: _viewType,
-                layoutDirection: TextDirection.ltr,
+                layoutDirection: widget.layoutDirection,
                 creationParams: alhPdfViewCreationParamsMap,
                 creationParamsCodec: const StandardMessageCodec(),
                 onFocus: () {
@@ -325,6 +325,7 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
           gestureRecognizers: widget.gestureRecognizers,
           creationParams: alhPdfViewCreationParamsMap,
           creationParamsCodec: const StandardMessageCodec(),
+          layoutDirection: widget.layoutDirection,
         );
       default:
         throw Exception(
@@ -349,8 +350,7 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
     this._alhPdfInternalController = AlhPdfInternalController(id: id);
     this._alhPdfViewController = alhPdfViewController;
 
-    unawaited(this._handleRotationChanged(
-        orientation: MediaQuery.of(context).orientation));
+    unawaited(this._handleRotationChanged(orientation: MediaQuery.of(context).orientation));
 
     widget.onViewCreated?.call(alhPdfViewController);
   }
@@ -362,8 +362,7 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
   /// with all current params.
   /// This postFrameCallBack is necessary to ensure that the rebuild was finished
   /// before the native part can calculate the FitPolicy for the PDF.
-  Future<void> _handleRotationChanged(
-      {required Orientation orientation}) async {
+  Future<void> _handleRotationChanged({required Orientation orientation}) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await this._alhPdfInternalController?.setOrientation(
             orientation: orientation,
