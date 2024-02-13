@@ -31,8 +31,9 @@ class AlhPdfViewCreationParams {
 
   /// Flag to know if onLinkHandle is provided
   final bool hasOnLinkHandle;
+  final TextDirection layoutDirection;
 
-  const AlhPdfViewCreationParams({
+  const AlhPdfViewCreationParams( {
     required this.filePath,
     required this.bytes,
     required this.fitPolicy,
@@ -54,6 +55,7 @@ class AlhPdfViewCreationParams {
     required this.enableDefaultScrollHandle,
     required this.spacing,
     required this.hasOnLinkHandle,
+    required this.layoutDirection,
   });
 
   Map<String, dynamic> toMap() => {

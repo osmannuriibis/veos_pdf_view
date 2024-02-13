@@ -393,6 +393,7 @@ class _AlhPdfViewState extends State<AlhPdfView> with WidgetsBindingObserver {
         enableDefaultScrollHandle: widget.enableDefaultScrollHandle,
         spacing: widget.spacing,
         hasOnLinkHandle: widget.onLinkHandle != null,
+        layoutDirection: widget.layoutDirection,
       );
 }
 
